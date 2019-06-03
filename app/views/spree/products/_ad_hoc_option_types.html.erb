@@ -25,17 +25,20 @@
           <%= render partial: partial_name, locals: {option_type: ad_hoc_option_type, class_str: class_str} %>
           </div>
         <% else %>
-          <li>
-            <% select_opts = { class: "#{class_str} form-control" } %>
-            <% select_opts[:prompt] = 'None' if ad_hoc_option_type.option_values.size > 1 && ad_hoc_option_type.option_values.none? {|option_value| option_value.selected? }%>
+          <h5 class='presentation-for-ad-hoc-option-value'><%= option_type.presentation %>: </h5>
+
+          <%- ad_hoc_option_value_options(ad_hoc_option_type.option_values).each do |val| %>
             <% selected_option_value = ad_hoc_option_type.option_values.detect {|option_value| option_value.selected? } %>
+
             <div class="col-md-<%= Spree.t(:variant_col_size) %> form-group">
-              <h5 class='presentation-for-ad-hoc-option-value'><%= option_type.presentation %>: </h5>
               <div class='form-for-ad-hoc-option-value'>
-                <%= select_tag "ad_hoc_option_values[#{ad_hoc_option_type.id}]",options_for_select(ad_hoc_option_value_options(ad_hoc_option_type.option_values), selected_option_value.present? ? selected_option_value.id.to_s : nil), select_opts %>
+                <label>
+                  <%= check_box_tag "ad_hoc_option_values[]", val.last, selected_option_value.present? ? selected_option_value.id.to_s : nil %>
+                  <%= val.first %>
+                </label>
               </div>
             </div>
-          </li>
+          <%- end %>
         <% end %>
       <% end %>
     </ul>
