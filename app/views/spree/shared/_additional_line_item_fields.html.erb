@@ -1,9 +1,11 @@
 <div class='customizations'>
   <%# TODO: group multi-select options (e.g. toppings) %>
   <ul class='list-group list-unstyled'>
-    <% item.ad_hoc_option_values.each do |ad_hoc_option_value| %>
-      <li><b><%= ad_hoc_option_value.option_value.option_type.presentation %>:</b> <%= ad_hoc_option_value.option_value.presentation %></li>
+
+    <% item.options_text.split("\n").each do |line| %>
+      <li><%= line %></li>
     <% end %>
+
     <% item.product_customizations.each do |customization| %>
       <% next if customization.customized_product_options.all? {|customized_product_option| customized_product_option.empty? } %>
       <li><b><%= customization.product_customization_type.presentation %>: </b></li>
