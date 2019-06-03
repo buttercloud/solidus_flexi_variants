@@ -3,14 +3,37 @@ module Spree
     has_many :ad_hoc_option_values_line_items, dependent: :destroy
     has_many :ad_hoc_option_values, through: :ad_hoc_option_values_line_items
     has_many :product_customizations, dependent: :destroy
+    validate :required_option_types
+
+    def required_option_types
+      required = product.ad_hoc_option_types.select(&:is_required?)
+      required_ids = required.map(&:id)
+      selected = ad_hoc_option_values.map(&:ad_hoc_option_type)
+      selected_ids = selected.map(&:id)
+
+      res = required_ids.all? { |item| selected_ids.include?(item) }
+
+      if !res
+        err_msg_list = (required - selected).map(&:presentation).join(', ')
+
+        self.errors.add(:base, "Some options are required: #{err_msg_list}")
+      end
+    end
 
     def options_text # REFACTOR
       if customized?
         str = Array.new
 
         ad_hoc_opt_values = ad_hoc_option_values.sort_by(&:position)
-        ad_hoc_option_values.sort_by(&:position).each do |pov|
-          str << "#{pov.option_value.option_type.presentation} = #{pov.option_value.presentation}"
+
+        ad_hoc_opt_values_group = ad_hoc_option_values.group_by do |opt_value|
+          opt_value.ad_hoc_option_type.presentation
+        end
+
+        ad_hoc_opt_values_group.each do |opt_type, opt_values|
+          tmp = "#{opt_type}: "
+          tmp += opt_values.map(&:presentation).join(", ")
+          str << tmp
         end
 
         product_customizations.each do |customization|
@@ -20,7 +43,7 @@ module Spree
           str << customization_type_text + ": #{opts_text}"
         end
 
-        str.join('\n')
+        str.join("\n")
       else
         variant.options_text
       end
