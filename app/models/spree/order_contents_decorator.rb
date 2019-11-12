@@ -41,11 +41,11 @@ Spree::OrderContents.class_eval do
   end
 
   def flexi_variants(variant, line_item, product_customizations_values, ad_hoc_option_value_ids)
-      store = Spree::Store.default
       product_customizations_values ||= []
       ad_hoc_option_value_ids ||= []
-      customizations_offset_price = Spree::Money.new(0, currency: store.default_currency)
-      ad_hoc_options_offset_price = Spree::Money.new(0, currency: store.default_currency)
+      currency = line_item.pricing_options.desired_attributes[:currency]
+      customizations_offset_price = Spree::Money.new(0, currency: currency)
+      ad_hoc_options_offset_price = Spree::Money.new(0, currency: currency) 
 
       if product_customizations_values.count > 0
         customizations_offset_price = line_item.add_customizations(product_customizations_values)
@@ -57,8 +57,7 @@ Spree::OrderContents.class_eval do
         ad_hoc_options_offset_price = line_item.add_ad_hoc_option_values(ad_hoc_option_value_ids)
       end
 
-      pricing_options = Spree::Variant::PricingOptions.new({currency: store.default_currency, country_iso: store.cart_tax_country_iso})
-      line_item.price = (variant.price_for(pricing_options) + customizations_offset_price + ad_hoc_options_offset_price).to_d
+      line_item.price = (variant.price_for(line_item.pricing_options) + customizations_offset_price + ad_hoc_options_offset_price).to_d
 
       return line_item
   end
