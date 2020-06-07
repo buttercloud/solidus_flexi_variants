@@ -14,6 +14,7 @@ Spree::Order.class_eval do
     existing_customizations = line_item.product_customizations
     new_customizations = options[:product_customizations]
 
+    return true if new_customizations.nil?
     return true if existing_customizations.empty? && new_customizations.empty?
 
     return false unless existing_customizations.pluck(:product_customization_type_id).sort == new_customizations.pluck(:product_customization_type_id).sort
