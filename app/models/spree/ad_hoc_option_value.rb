@@ -26,7 +26,11 @@ module Spree
     end
 
     def presentation_with_price
-      "#{presentation} (#{price_modifier})"
+      if price_modifier == 0
+        presentation
+      else
+        "#{presentation} (#{price_modifier})"
+      end
     end
   end
 end
