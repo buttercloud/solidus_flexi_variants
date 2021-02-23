@@ -24,5 +24,9 @@ module Spree
     def cost_price
       cost_price_modifier || price_modifier || 0
     end
+
+    def presentation_with_price
+      "#{presentation} (#{price_modifier})"
+    end
   end
 end

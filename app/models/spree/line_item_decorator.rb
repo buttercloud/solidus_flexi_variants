@@ -32,7 +32,7 @@ module Spree
 
         ad_hoc_opt_values_group.each do |opt_type, opt_values|
           tmp = "#{opt_type}: "
-          tmp += opt_values.map(&:presentation).join(", ")
+          tmp += opt_values.map(&:presentation_with_price).join(", ")
           str << tmp
         end
 
